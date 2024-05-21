@@ -1,0 +1,30 @@
+steps:
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    dir: './'  # specify the working directory
+    entrypoint: /bin/bash
+    args: 
+    - -c
+    - |
+       for line in $(cat ./manual-cloudbuild/microservices.txt)
+       do 
+       echo "Reading line: $line"
+       config="${line}/cloudbuild/cloudbuild.yaml"
+       echo "Config path: $config"
+       if [[ ! -f "${config}" ]]; then
+        echo "No such file: $config"
+        continue
+       fi
+       echo "Submitting build for: $line"
+       if [[ "$line" == "frontend" ]]; then
+         substitutions="BRANCH_NAME=${BRANCH_NAME},\
+                         REPO_NAME=${REPO_NAME},\
+                         _ENV=${_ENV}"
+       elif [[ "$line" == "backend" ]]; then
+         substitutions="BRANCH_NAME=${BRANCH_NAME},\
+                         REPO_NAME=${REPO_NAME},\
+                         _ENV=${_ENV}"
+       fi
+       substitutions=$(echo $substitutions | tr -d '[:space:]')
+       gcloud builds submit $line --config=${config} --substitutions=${substitutions} --region=${LOCATION} || echo "Error submitting build for: $line"
+       done

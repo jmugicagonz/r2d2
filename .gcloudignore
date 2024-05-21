@@ -1,0 +1,13 @@
+# Ignore all files
+**
+
+# Whitelist files needed for the build
+!backend/**
+
+# Whitelist everything inside frontend
+!frontend/**
+
+# Ignore files defined in .dockerignore
+frontend/node_modules
+frontend/.next
+frontend/yarn.lock

@@ -1,0 +1,1 @@
+gcloud builds submit --substitutions=BRANCH_NAME=dev-juan,REPO_NAME=r2d2,_ENV=prod --config=manual-cloudbuild/cloudbuild.yaml --region=europe-west1 .

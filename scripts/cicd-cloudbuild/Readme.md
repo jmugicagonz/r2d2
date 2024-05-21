@@ -1,0 +1,1 @@
+Inspired on https://github.com/ajiteshk/MicroServicesCI-In-MonoRepo/blob/main/cloudbuild.yaml

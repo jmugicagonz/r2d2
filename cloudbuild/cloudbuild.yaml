@@ -1,0 +1,54 @@
+steps:
+
+#PART1: DEPLOYING THE BACKEND
+
+# First we build the backend and we deploy it to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    [
+      'run', 'deploy', '${REPO_NAME}-${BRANCH_NAME}-backend',
+      '--source', './backend/.',
+      # '--image', '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${REPO_NAME}-${BRANCH_NAME}-backend:${_IMAGE_TAG}',
+      '--region', '${LOCATION}', '--platform', 'managed', #'--allow-unauthenticated',
+      '--update-secrets', 'GOOGLE_CLIENT=google-client-secret:latest, AUTH_SECRET=AUTH_SECRET:latest',
+      '--update-env-vars',  'PROJECT_ID=${PROJECT_ID}, ENVIRONMENT=${_ENV}' #, URL_ORIGIN=${_URL_ORIGIN}'
+    ]
+
+#PART2: DEPLOYING THE FRONTEND
+
+# STEP1: Push to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    [
+      'run', 'deploy', '${REPO_NAME}-${BRANCH_NAME}-frontend',
+      '--source', './frontend/.',
+      '--region', '${LOCATION}', '--platform', 'managed', '--allow-unauthenticated',
+      '--update-secrets', 'GOOGLE_CLIENT=google-client-secret:latest, AUTH_SECRET=AUTH_SECRET:latest', 
+      '--update-env-vars',  'PROJECT_ID=${PROJECT_ID}',
+      '--update-env-vars', 'NEXT_PUBLIC_ENV=${_ENV}',
+      # '--verbosity', 'debug'
+    ]
+
+# STEP2: Update Auth URL
+- id: 'release'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'sh'  
+  args: 
+  - '-c'
+  - | 
+      gcloud run deploy ${REPO_NAME}-${BRANCH_NAME}-frontend \
+        --region ${LOCATION} --platform managed --allow-unauthenticated  \
+        --image ${LOCATION}-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/${REPO_NAME}-${BRANCH_NAME}-frontend \
+        --update-env-vars AUTH_URL=$(gcloud run services describe $REPO_NAME-$BRANCH_NAME-frontend --region $LOCATION --format "value(status.url)")/api/auth \
+        --update-env-vars NEXT_PUBLIC_URL_BACKEND=$(gcloud run services describe $REPO_NAME-$BRANCH_NAME-backend --region $LOCATION --format "value(status.url)") \
+
+
+# STEP3: Verify environment variables have been correctly set
+- id: 'verify_env_vars'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'sh'  
+  args: 
+  - '-c'
+  - | 
+      gcloud run services describe ${REPO_NAME}-${BRANCH_NAME}-frontend \
+        --region ${LOCATION} --platform managed --format "value(spec.template.spec.containers[0].env)"

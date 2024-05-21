@@ -1,0 +1,1 @@
+gcloud builds submit --substitutions=BRANCH_NAME=dev-juan,REPO_NAME=r2d2,_ENV=prod,_URL_ORIGIN=https://r2d2.loonstep.com --config=cloudbuild/cloudbuild.yaml --region=europe-west1 .

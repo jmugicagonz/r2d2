@@ -1,0 +1,47 @@
+steps:
+
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: /bin/bash
+    args: 
+    - -c
+    - |
+      git fetch --depth=2 origin $BRANCH_NAME
+      echo hello
+      git  log
+      if git rev-parse --verify HEAD^ >/dev/null 2>&1
+      then
+        git --no-pager diff --name-only HEAD^ HEAD | grep "/" | cut -d/ -f1 | sort | uniq > /workspace/diff.txt
+      else
+        echo "No parent commit"
+      fi
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: /bin/bash
+    args: 
+    - -c
+    - |
+       for line in $(cat /workspace/diff.txt)
+       do 
+       echo "Reading line: $line"
+       config="${line}/cloudbuild/cloudbuild.yaml"
+       echo "Config path: $config"
+       if [[ ! -f "${config}" ]]; then
+        echo "No such file: $config"
+        continue
+       fi
+       echo "Submitting build for: $line"
+       if [[ "$line" == "frontend" ]]; then
+         substitutions="BRANCH_NAME=${BRANCH_NAME},\
+                         REPO_NAME=${REPO_NAME},\
+                         _ENV=${_ENV},\
+                         _NEXT_PUBLIC_URL_BACKEND=${_BACKEND_URL},\
+                         _AUTH_URL=${_FRONTEND_URL}"
+       elif [[ "$line" == "backend" ]]; then
+         substitutions="BRANCH_NAME=${BRANCH_NAME},\
+                         REPO_NAME=${REPO_NAME},\
+                         _ENV=${_ENV},\
+                         _URL_ORIGIN=${_FRONTEND_URL}"
+       fi
+       substitutions=$(echo $substitutions | tr -d '[:space:]')
+       gcloud builds submit $line --config=${config} --substitutions=${substitutions} --region=${LOCATION} || echo "Error submitting build for: $line"
+       done

@@ -1,0 +1,30 @@
+# substitutions:
+#   _IMAGE_TAG: 'latest'
+
+steps:
+
+# # use Buildpacks to create a container image
+# - name: 'gcr.io/k8s-skaffold/pack'
+#   dir: './'
+#   entrypoint: 'pack'
+#   args:
+#     [
+#       'build', '--builder=gcr.io/buildpacks/builder', '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${REPO_NAME}-${BRANCH_NAME}-backend:${_IMAGE_TAG}'
+#     ]
+
+# #pushing to artifact registry
+# - name: 'gcr.io/cloud-builders/docker'
+#   args: ['push',  '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${REPO_NAME}-${BRANCH_NAME}-backend:${_IMAGE_TAG}']
+
+# Push to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    [
+      'run', 'deploy', '${REPO_NAME}-${BRANCH_NAME}-backend',
+      '--source', '.',
+      # '--image', '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${REPO_NAME}-${BRANCH_NAME}-backend:${_IMAGE_TAG}',
+      '--region', '${LOCATION}', '--platform', 'managed', '--allow-unauthenticated',
+      '--update-secrets', 'GOOGLE_CLIENT=google-client-secret:latest, AUTH_SECRET=AUTH_SECRET:latest',
+      '--update-env-vars',  'PROJECT_ID=${PROJECT_ID}, ENVIRONMENT=${_ENV}' #, URL_ORIGIN=${_URL_ORIGIN}'
+    ]
+
