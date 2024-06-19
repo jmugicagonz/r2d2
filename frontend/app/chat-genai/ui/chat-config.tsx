@@ -85,43 +85,63 @@ function ChatConfigContent () {
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={chatConfig.model}
+                    value={chatConfig.MODEL}
                     label="Model"
                     onChange={(e) => { 
                         // setLocalModel(e.target.value);
-                        onChange("model", e.target.value);
+                        onChange("MODEL", e.target.value);
                     }}
                     // onBlur={() => handleBlur("model", localModel)}
                 >
-                    <MenuItem value={"gemini-1.0-pro-001"}>gemini-1.0-pro-001</MenuItem>
-                    <MenuItem value={"gemini-pro-vision"}>gemini-pro-vision</MenuItem>
+                    <MenuItem value={"gemini-1.5-pro"}>gemini-1.5-pro</MenuItem>
+                    <MenuItem value={"gemini-1.5-flash"}>gemini-1.5-flash</MenuItem>
                 </Select>
             </FormControl>
         );
     }
 
-    const Grounding = () => {
+    const GroundingVAI = () => {
         // const [localGrounding, setLocalGrounding] = React.useState(chatConfig.grounding);
         return (
             <FormControlLabel 
                 control={
                     <Switch
-                        checked={chatConfig.grounding}
+                        checked={chatConfig.GROUND_VAI}
                         onChange={(e) => { 
                             // setLocalGrounding(e.target.checked);
-                            onChange("grounding", e.target.checked);
+                            onChange("GROUND_VAI", e.target.checked);
                         }}
                         // onBlur={() => handleBlur("grounding", localGrounding)}
                     />
                 } 
-                label="Grounding" 
+                label="Grounding Data" 
                 id="grounding"
             />
         );
       }
+    
+    const GroundingSearch = () => {
+    // const [localGrounding, setLocalGrounding] = React.useState(chatConfig.grounding);
+    return (
+        <FormControlLabel 
+            control={
+                <Switch
+                    checked={chatConfig.GROUND_SEARCH}
+                    onChange={(e) => { 
+                        // setLocalGrounding(e.target.checked);
+                        onChange("GROUND_SEARCH", e.target.checked);
+                    }}
+                    // onBlur={() => handleBlur("grounding", localGrounding)}
+                />
+            } 
+            label="Grounding Search" 
+            id="grounding"
+        />
+    );
+    }
 
     const Temperature = () => {
-        const [localTemperature, setLocalTemperature] = React.useState(chatConfig.temperature);
+        const [localTemperature, setLocalTemperature] = React.useState(chatConfig.TEMPERATURE);
         const [sliderValue, setSliderValue] = React.useState(localTemperature);
         const [textFieldValue, setTextFieldValue] = React.useState(String(localTemperature));
 
@@ -132,7 +152,7 @@ function ChatConfigContent () {
         const handleTemperatureChangeCommited = (event: any, newValue: number | number[]) => {
                 // setSliderValue(newValue as number);
                 // setTextFieldValue(newValue as number);
-                onChange("temperature", newValue as number);
+                onChange("TEMPERATURE", newValue as number);
         };
         return (
             <>
@@ -167,7 +187,7 @@ function ChatConfigContent () {
                             const newValue = parseFloat(event.target.value);
                             if (!isNaN(newValue) && newValue >= 0 && newValue <= 1) {
                                 setSliderValue(newValue);
-                                onChange("temperature", newValue);
+                                onChange("TEMPERATURE", newValue);
                             }
                         }}
                         sx={{ mr: 2 }}
@@ -180,13 +200,13 @@ function ChatConfigContent () {
         }
     
     const MaxTokens = () => {
-        const [localMaxTokens, setLocalMaxTokens] = React.useState(chatConfig.max_tokens);
+        const [localMaxTokens, setLocalMaxTokens] = React.useState(chatConfig.MAX_TOKENS);
         return (
             <TextField
                 id="maxTokens"
                 label=" Max Tokens "
                 onChange={(e) => setLocalMaxTokens(Number(e.target.value))}
-                onBlur={() => handleBlur("max_tokens", localMaxTokens)}
+                onBlur={() => handleBlur("MAX_TOKENS", localMaxTokens)}
                 value={localMaxTokens}
                 autoFocus={false}
             />
@@ -205,14 +225,15 @@ function ChatConfigContent () {
                     <FormControl>
                         <Stack spacing={2}>
                             <Model />
-                            {chatConfig.model === "gemini-1.0-pro-001" && <Grounding />}
-                            {chatConfig.grounding && 
+                            <GroundingVAI />
+                            {chatConfig.GROUND_VAI && 
                                 <>
                                     <DataStoreId />
                                     <DataStoreProjectId />
                                     <DataStoreLocation />
                                 </>  
                             }
+                            <GroundingSearch />
                             <Temperature />
                             <MaxTokens />
                         </Stack>

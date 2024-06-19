@@ -3,9 +3,9 @@ import { Inter } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "./api/auth";
 import HeadBar from "@/app/head-bar/HeadBar";
-import LoginGoogle from "./r2d2/ui/header-components/Login";
+import LoginGoogle from "./head-bar/Login";
 import "./globals.css";
-import SignInMessage from './r2d2/ui/utils-components/SignInMessage';
+import SignInMessage from './components/base-ui/SignInMessage';
 
 const inter = Inter({ subsets: ['latin'] })
 

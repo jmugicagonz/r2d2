@@ -17,13 +17,14 @@ export default function ChatSection () {
 
 
     const [chatConfig, setChatConfig] = React.useState<ChatConfiguration>({
-        model: 'gemini-1.0-pro-001',
+        MODEL: 'gemini-1.5-flash',
         DATA_STORE_PROJECT_ID: 'ai-assistant-417415',
         DATA_STORE_LOCATION: 'global',
-        DATA_STORE_ID: 'emg-spain-rules-ocr_1712471668858',
-        grounding: false,
-        temperature: 0.1,
-        max_tokens: 8192
+        DATA_STORE_ID: 'summer-camp-intro-rag_1718630466852',
+        GROUND_VAI: false,
+        GROUND_SEARCH: false,
+        TEMPERATURE: 0.1,
+        MAX_TOKENS: 8192
       })
 
     const handleSubmit = async (e: React.FormEvent) => {

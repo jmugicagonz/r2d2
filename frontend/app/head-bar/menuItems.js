@@ -5,8 +5,6 @@ import AssistantIcon from '@mui/icons-material/Assistant';
 
 
 export const menuItems=[
-    {text: "Home", icon:<Home /> ,href: "/"},
-    {text: "R2D2", icon:<SmartToy /> ,href: "/r2d2"},
     {text: "Vertex Search", icon:<LibraryBooksIcon /> ,href: "/vertex-search"},
     {text: "Chat GenAI", icon:<AssistantIcon /> ,href: "/chat-genai"}
 ];

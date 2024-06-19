@@ -4,7 +4,7 @@ import { StreamingTextResponse } from 'ai';
 import { IdTokenClient } from 'google-auth-library';
 import { Sparkles } from 'lucide-react';
 import auth from '@/app/components/gcp-components/google-auth/google-auth';
-import { Message } from '../lib/types';
+import { Message, ChatConfiguration } from '../lib/types';
 import ChatMessage  from '../ui/chat-message'
 
 let client: IdTokenClient;
@@ -38,7 +38,7 @@ function ErrorCard() {
 }
 
 // export async function submitUserMessage(userInput: string, configuration: Configuration) {
-export async function submitUserMessage(userInput: string, configuration: any) {
+export async function submitUserMessage(userInput: string, configuration: ChatConfiguration) {
   'use server';
 
   const aiState = getMutableAIState<typeof AI>();
@@ -105,6 +105,8 @@ export async function submitUserMessage(userInput: string, configuration: any) {
 
         const chunk = new TextDecoder("utf-8").decode(value);
         message.content += chunk;
+
+        console.log("Message content: ", message.content)
         card.update(
           <>
             <ChatMessage {...message} />
@@ -132,8 +134,7 @@ export async function submitUserMessage(userInput: string, configuration: any) {
 
 // TODO: see if this function can be taken as a separate file
 // Call Vertex AI Search API
-// export async function callPythonBackend({query, configuration}: {query: string , configuration: Configuration}): Promise<any> {
-export async function callPythonBackend({messages, configuration}: {messages: Message[], configuration: any}): Promise<any> {
+export async function callPythonBackend({messages, configuration}: {messages: Message[] , configuration: ChatConfiguration}): Promise<any> {
 
   const newReqJSON = {
     "configuration" : configuration,
@@ -143,10 +144,11 @@ export async function callPythonBackend({messages, configuration}: {messages: Me
   const backend_url = process?.env?.NEXT_PUBLIC_URL_BACKEND? process.env.NEXT_PUBLIC_URL_BACKEND as string: "http://localhost:8000";
 
   const targetAudience = backend_url;
-  const url = backend_url+'/api/chat';
+  const url = backend_url+'/api/rag';
 
   async function request() {
     console.info(`request ${url} with target audience ${targetAudience}`);
+    console.info(`request body: ${JSON.stringify(newReqJSON)}`);
   
     if (process?.env?.NEXT_PUBLIC_ENV == "dev") {
       // Running locally, bypass ID token generation

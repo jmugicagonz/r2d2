@@ -1,8 +1,8 @@
 import logging
 import os
 import uvicorn
-from app.modules.chat.router import chat_router
 from app.modules.vertex_search.router import search_router
+from app.modules.rag.router import rag_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.config import environment #, url_origin
@@ -39,8 +39,8 @@ app.add_middleware(
 #     )
 
 #Include routers API
-app.include_router(chat_router, prefix="/api/chat")
 app.include_router(search_router, prefix="/api/search")
+app.include_router(rag_router, prefix="/api/rag")
 
 
 if __name__ == "__main__":

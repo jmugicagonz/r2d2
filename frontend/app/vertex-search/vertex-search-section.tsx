@@ -19,7 +19,7 @@ export default function VertexSearchSection() {
   const [vertexSearchConfig, setVertexSearchConfig] = React.useState<VertexSearchConfiguration>({
     DATA_STORE_PROJECT_ID: 'ai-assistant-417415',
     DATA_STORE_LOCATION: 'global',
-    DATA_STORE_ID: 'emg-spain-rules_1712471466519',
+    DATA_STORE_ID: 'summer-camp-rag_1718630532130',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
